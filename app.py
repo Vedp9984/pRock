@@ -360,13 +360,13 @@ def show():
     # print(img_b64)
     print("length:", len(img_b64))
     unique_uname = session['user_details']['username']
-    query = f'SELECT id FROM users WHERE username = "{unique_uname}"'
+    query = 'SELECT id FROM users WHERE username = $1'
     print(query)
-    cur.execute(query)
+    cur.execute(query, (unique_uname,))
     uId = cur.fetchone()
     uId = uId[0]
-    query = f'SELECT image_name from uploaded_images WHERE user_id = {uId}'
-    cur.execute(query)
+    query = 'SELECT image_name from uploaded_images WHERE user_id = $1'
+    cur.execute(query, (uId,))
     fake_img_names = cur.fetchall()
     actual_img_names = []
     for imgs in fake_img_names:
@@ -374,8 +374,8 @@ def show():
     # print(actual_img_names)
     dictionary = {}
     iterator = 0
-    query = f'SELECT bindata FROM uploaded_images WHERE user_id = {uId}'
-    cur.execute(query)
+    query = 'SELECT bindata FROM uploaded_images WHERE user_id = $1'
+    cur.execute(query, (uId,))
     fake_blobs = cur.fetchall()
     actual_blobs = []
     for blob in fake_blobs:
