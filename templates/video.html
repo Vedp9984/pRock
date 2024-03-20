@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Custom Video Player</title>
+    <style>
+    body {
+        margin: 0;
+        padding: 0;
+        font-family: Arial, sans-serif;
+    }
+    
+    .video-container {
+        position: relative;
+        width: 100%;
+        max-width: 800px;
+        margin: 0 auto;
+        border-radius: 10px;
+        overflow: hidden;
+    }
+    
+    video {
+        width: 100%;
+        height: auto;
+        display: block;
+    }
+    
+    .controls {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 5px;
+        box-sizing: border-box;
+    }
+    
+    .control-button {
+        background-color: transparent;
+        color: #fff;
+        border: none;
+        cursor: pointer;
+        font-size: 16px;
+        padding: 8px;
+        transition: background-color 0.3s;
+    }
+    
+    .control-button:hover {
+        background-color: rgba(255, 255, 255, 0.2);
+    }
+    
+    .speed-options {
+        position: absolute;
+        bottom: calc(100% + 10px);
+        left: 50%;
+        transform: translateX(-50%);
+        background-color: rgba(0, 0, 0, 0.7);
+        padding: 5px;
+        border-radius: 5px;
+        display: none;
+    }
+    
+    .speed-options button {
+        display: block;
+        background-color: transparent;
+        color: #fff;
+        border: none;
+        cursor: pointer;
+        font-size: 14px;
+        padding: 5px;
+        margin: 3px;
+    }
+</style>    
+</head>
+<body>
+    <div class="video-container">
+        <video id="video">
+            <source src="../Users-images/video.mp4" type="video/mp4">
+            
+        </video>
+        <div class="controls">
+            <button class="control-button" id="play-pause-button">&#9658;</button>
+            <button class="control-button" id="rewind-button">&#8634;</button>
+            <input type="range" class="control-button" id="seek-bar" value="0">
+            <button class="control-button" id="mute-button">&#128263;</button>
+            <input type="range" class="control-button" id="volume-bar" min="0" max="1" step="0.1" value="1">
+            <button class="control-button" id="speed-button">&#x1F504;</button>
+            <button class="control-button" id="fullscreen-button">&#x26F6;</button>
+            <select id="resolution-selector" class="control-button">
+                <option value="144">144p</option>
+                <option value="360">360p</option>
+                <option value="480">480p</option>
+                <option value="720">720p</option>
+                <option value="1080">1080p</option>
+            </select>
+            <div class="speed-options" id="speed-options">
+                <button class="speed-option" data-speed="0.5">0.5x</button>
+                <button class="speed-option" data-speed="1">1x</button>
+                <button class="speed-option" data-speed="1.5">1.5x</button>
+                <button class="speed-option" data-speed="2">2x</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const video = document.getElementById('video');
+        const playPauseButton = document.getElementById('play-pause-button');
+        const rewindButton = document.getElementById('rewind-button');
+        const seekBar = document.getElementById('seek-bar');
+        const muteButton = document.getElementById('mute-button');
+        const volumeBar = document.getElementById('volume-bar');
+        const speedButton = document.getElementById('speed-button');
+        const speedOptions = document.getElementById('speed-options');
+        const fullscreenButton = document.getElementById('fullscreen-button');
+        const resolutionSelector = document.getElementById('resolution-selector');
+
+        playPauseButton.addEventListener('click', function() {
+            if (video.paused) {
+                video.play();
+                playPauseButton.textContent = 'Pause';
+            } else {
+                video.pause();
+                playPauseButton.textContent = 'Play';
+            }
+        });
+
+        rewindButton.addEventListener('click', function() {
+            video.currentTime -= 10;
+        });
+
+        video.addEventListener('timeupdate', function() {
+            seekBar.value = video.currentTime / video.duration * 100;
+        });
+
+        seekBar.addEventListener('input', function() {
+            video.currentTime = video.duration * (seekBar.value / 100);
+        });
+
+        muteButton.addEventListener('click', function() {
+            video.muted = !video.muted;
+            if (video.muted) {
+                muteButton.textContent = 'Unmute';
+            } else {
+                muteButton.textContent = 'Mute';
+            }
+        });
+
+        volumeBar.addEventListener('input', function() {
+            video.volume = volumeBar.value;
+        });
+
+        speedButton.addEventListener('click', function() {
+            speedOptions.style.display = (speedOptions.style.display === 'none') ? 'block' : 'none';
+        });
+
+        speedOptions.addEventListener('click', function(event) {
+            if (event.target.classList.contains('speed-option')) {
+                const speed = parseFloat(event.target.dataset.speed);
+                video.playbackRate = speed;
+                speedOptions.style.display = 'none';
+            }
+        });
+
+        resolutionSelector.addEventListener('change', function() {
+    const selectedResolution = this.value;
+    console.log('Selected resolution:', selectedResolution);
+    const sourceElement = video.querySelector('source');
+    console.log('Current video source:', sourceElement.src);
+    const currentSrc = sourceElement.src;
+    const newSrc = currentSrc.replace(/\d+p/, selectedResolution + 'p');
+    console.log('New video source:', newSrc);
+    sourceElement.src = newSrc;
+    video.load();
+});
+
+        fullscreenButton.addEventListener('click', function() {
+            if (video.requestFullscreen) {
+                video.requestFullscreen();
+            } else if (video.mozRequestFullScreen) { /* Firefox */
+                video.mozRequestFullScreen();
+            } else if (video.webkitRequestFullscreen) { /* Chrome, Safari and Opera */
+                video.webkitRequestFullscreen();
+            } else if (video.msRequestFullscreen) { /* IE/Edge */
+                video.msRequestFullscreen();
+            }
+        });
+    </script>
+</body>
+</html>

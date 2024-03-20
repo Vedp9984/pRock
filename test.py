@@ -19,7 +19,6 @@ from flask import Flask, render_template, request, redirect, url_for, jsonify, s
 from moviepy.editor import ImageClip, concatenate_videoclips, AudioFileClip, concatenate_audioclips, VideoFileClip, ImageSequenceClip
 from moviepy.editor import *
 
-
 app = Flask(__name__)
 app.secret_key = "this_is_worlds_most_secured_secret_key"
 mydb = pymysql.connect(
@@ -29,9 +28,7 @@ mydb = pymysql.connect(
     database = "media_database"
 )
 # mydb=psycopg2.connect("postgresql://ved:_fH3BfLkIHVWrNGQkG557Q@papamerepapa-9041.8nk.gcp-asia-southeast1.cockroachlabs.cloud:26257/pRock?sslmode=verify-full")
-# cur = mydb.cursor()
-# cur.execute("CREATE DATABASE pRock")
-# cur.execute("use pRock")
+cur = mydb.cursor()
 if mydb.open:
     print("Connected")
     cur = mydb.cursor()
@@ -42,6 +39,15 @@ salt = bcrypt.gensalt()
 def hash_password(password):
     hashed_password = bcrypt.hashpw(password.encode('utf-8'), salt)
     return hashed_password.decode('utf-8')
+
+def empty_directory(directory_path):
+    for filename in os.listdir(directory_path):
+        file_path = os.path.join(directory_path, filename)
+        if os.path.isfile(file_path):
+            os.remove(file_path)
+            print(f"Deleted: {file_path}")
+        else:
+            print(f"Not a file: {file_path}")
 
 def moveImage(img_obj, filename):
     dest_dir = 'Users-images/'
@@ -206,8 +212,11 @@ def newHome():
 def get_video(filename):
     return send_file(os.path.join('Users-images', filename))
 
-# @app.route('/newVideo', methods = ['GET', 'POST'])
-def create_video(image_list, audio_flag, audio_file):
+@app.route('/newVideo', methods = ['GET', 'POST'])
+def view_video():
+    return render_template('video.html')
+
+def create_video(image_list, audio_flag, audio_file, num):
     frames = []
     for img_path in image_list:
         n = cv.imread(img_path)
@@ -217,8 +226,8 @@ def create_video(image_list, audio_flag, audio_file):
         frames.append(n)
 
     # Assuming you want each image to last for 3 seconds, calculate duration per image
-    duration_per_image = 3  # seconds
-    fps = 1/3  # frames per second
+    duration_per_image = num  # seconds
+    fps = 1 # frames per second
     
     # Calculate the total duration of the video
     total_duration = len(image_list) * duration_per_image
@@ -301,11 +310,12 @@ def show():
     img_b64 = request.form.getlist('images')
     bg_music = request.form.get('bgm')
     audio_flag = request.form.get('music_flag')
+    FPSinv = request.form.get('fpsinv')
     # print(img_b64)
     print("length:", len(img_b64))
     unique_uname = session['user_details']['username']
     query = f'SELECT id FROM users WHERE username = "{unique_uname}"'
-    print(query)
+    print(query, (unique_uname, ))
     cur.execute(query)
     uId = cur.fetchone()
     uId = uId[0]
@@ -347,7 +357,7 @@ def show():
         music_blob = music_blob[0]
     # music_file_path = 'Users-images' + bg_music
     bg_music = bg_music + '.mp3'
-    video = create_video(final_paths, audio_flag, bg_music)
+    video = create_video(final_paths, audio_flag, bg_music, FPSinv)
     
     return Response(video, 200)
 
@@ -355,6 +365,7 @@ def show():
 def logout():
     session.pop('jwt_token', None)
     session.pop('user_details', None)
+    empty_directory('Users-images')
     return redirect(url_for('index'))
 
 if __name__ == "__main__":
