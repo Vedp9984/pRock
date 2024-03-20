@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Photo-slideshow App</title>
+    <style>
+        body::before {
+            content: "";
+            position: fixed;
+            top: -150px;
+            left: 0;
+            width: 100%;
+            min-height: 100%;
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0) 60%, #ffffff 100%);
+            z-index: -1;
+            pointer-events: none;
+            animation: snowfallAnimation 5s linear infinite;
+        }
+
+        .snowflake {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background-color: #fff;
+            border-radius: 50%;
+            pointer-events: none;
+        }
+
+        .snowflake.simple-round {
+            background-color: #fff;
+
+        }
+
+        .snowflake.small-round {
+            width: 6px;
+            height: 6px;
+        }
+
+
+        .snowflake.square {
+            background-color: #fff;
+            border-radius: 0;
+        }
+
+
+        .snowflake.diamond {
+            width: 8px;
+            height: 8px;
+            background-color: #fff;
+            clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
+        }
+
+        /* Animation */
+        @keyframes snowfallAnimation {
+            0% {
+                transform: translateY(-100%);
+            }
+
+            100% {
+                transform: translateY(100%);
+            }
+        }
+
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            /* background: linear-gradient(to right, #2980b9, #6dd5fa, #ffffff); */
+            background: linear-gradient(to right, #833ab4, #fd1d1d, #fcb045);
+            color: #fff;
+            margin: 0;
+            padding: 0;
+            min-height: 100%;
+            background-attachment: fixed;
+
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #3498db;
+            border: black solid;
+            padding: 20px;
+            background-color: black;
+            border-radius: 20px;
+        }
+
+        .options {
+            display: flex;
+            justify-content: space-around;
+            flex-direction: column;
+            width: auto;
+            margin-bottom: 20px;
+            text-decoration: none;
+        }
+
+        .option {
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+            cursor: pointer;
+            text-decoration: none;
+        }
+
+        .option:hover {
+            transform: translateY(-5px);
+        }
+
+        .option img {
+            width: 100px;
+            height: 100px;
+            object-fit: cover;
+            border-radius: 50%;
+            margin-bottom: 10px;
+            color: #3498db;
+        }
+
+        .option p {
+            margin: 0;
+            font-size: 16vm;
+            font-weight: bold;
+            border: black solid;
+            padding: 20px;
+            background-color: black;
+            border-radius: 20px;
+            color: #3498db;
+        }
+
+        .option:hover p {
+            color: #4CAF50;
+        }
+
+        @media screen {
+            .footer {
+                position: fixed;
+                bottom: 0;
+                width: 100%;
+                /* background: linear-gradient(to right, #2980b9, #6dd5fa, #ffffff); */
+                color: black;
+                text-align: center;
+                padding: 10px 0;
+            }
+
+            .footer h2 {
+                margin: 0;
+                padding: 0;
+                font-weight: normal;
+                color: #2980b9;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1 class="header">Hi {{ user }}! Welcome to pRock</h1>
+        <br>
+        <div class="options">
+            <a class="option" href="/phin">
+                <p style="text-align: center;">Add Files</p>
+            </a><br>
+            <a class="option" href="/create">
+                <p style="text-align: center;">Create Video</p>
+            </a><br>
+            <a class="option" href="/users">
+                <p style="text-align: center;">View All Users</p>
+            </a><br>
+            <a class="option" href="/logout">
+                <p align="center">Log out</p>
+            </a>
+            <p style="color: blue; text-align: center;">{{ permission }}</p>
+        </div>
+    </div>
+    <footer class="footer">
+        <h2>pRock</h2>
+        <p>Copyright © 2024 pRock Pvt. Ltd. All rights reserved.</p>
+    </footer>
+</body>
+
+</html>

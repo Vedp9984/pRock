@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Photo-slideshow App</title>
+    <style>
+        body{
+            font-family: 'Poppins', sans-serif;
+            /* background: linear-gradient(to right, #2980b9, #6dd5fa, #ffffff); */
+            background: linear-gradient(to right, #833ab4, #fd1d1d, #fcb045);
+            color: #fff;
+            color: #fff;
+            margin: 0;
+            padding: 0;
+            background-attachment: fixed;
+        } 
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #3498db;
+            border: black solid;
+            padding: 20px;
+            background-color: black;
+            border-radius: 20px;
+        }
+        /* .header:hover {
+            transform: translateY(-5px);
+        } */
+        .options {
+            display: flex;
+            justify-content: space-around;
+            width: 80%;
+            margin-bottom: 20px;
+        }
+        
+        .option {
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+            cursor: pointer;
+            /* Cursor changes to pointer on hover */
+            text-decoration: none;
+        }
+
+        .option:hover {
+            transform: translateY(-5px);
+        }
+
+        .option img {
+            width: 100px;
+            height: 100px;
+            object-fit: cover;
+            border-radius: 50%;
+            margin-bottom: 10px;
+            color: #3498db;
+        }
+
+        .option p {
+            margin: 0;
+            font-size: 24px;
+            font-weight: bold;
+            border: 2px solid transparent;
+            padding: 20px;
+            background-color: black;
+            border-radius: 20px;
+            color: #3498db;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .option:hover p {
+            color:#4CAF50;
+            border-color: #4CAF50;
+            box-shadow: 0 0 10px #4CAF50;
+        }
+
+        .option p::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border-radius: 20px;
+            background: radial-gradient(#4CAF50 15%, transparent 16%);
+            background-size: 10px 10px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .option:hover p::before {
+            opacity: 1;
+        }
+
+        .footer {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            /* background: linear-gradient(to right, #2980b9, #6dd5fa, #ffffff); */
+            color: black;
+            text-align: center;
+            padding: 10px 0;
+        }
+    </style>
+</head>
+<header>
+    
+</header>
+<body>
+    <div class="container">
+        <h1 class="header">Welcome to pRock</h1>
+        <div class="options">
+            <a class="option" href="/next/login">
+                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR6wZSfE2CIQxFNpA05SaXaHFTIddWHh_7bXg&usqp=CAU" alt="Logo 1">
+                <p>Sign In</p>
+            </a>
+            <a class="option" href="/next/signin">
+                <img src=" https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSIn-eStZobhRYCy-EwGVZR_7anoTd6CroZCikRqOcnObkip-iAjnewXvhg0E-b3F8LdG0&usqp=CAU" alt="Logo 2">
+                <p>Sign Up</p>
+            </a>
+        </div>
+        <p>{{ err }}</p>
+    </div>
+  
+    <footer class="footer" >
+        <h2>pRock</h2>
+        <p >Copyright © 2024 pRock Pvt. Ltd. All rights reserved.</p>
+    </footer>
+</body>
+
+</html>

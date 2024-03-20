@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Registration</title>
+    <link rel="stylesheet" type="text/css" href="styles.css">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            /* background: linear-gradient(to right, #297fb9e0, #6dd5fa, #ffffff);  */
+            background: linear-gradient(to right, #833ab4, #fd1d1d, #fcb045);
+            color: #fff;
+            color: #333;
+            margin: 0;
+            padding: 0;
+            background-attachment: fixed;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 2.5em;
+            margin-top: 30px;
+            color: darkblue;
+            text-decoration-color: #3498db;
+            text-decoration-style: solid;
+            text-orientation: sideways-right;
+            text-anchor: middle;
+        }
+
+        form {
+        
+            max-width: 400px;
+            margin: 0 auto;
+            background-color:rgba(255, 255, 255, 0.9);
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+        }
+
+        input {
+            width: 100%;
+            padding: 15px;
+            margin-bottom: 20px;
+            box-sizing: border-box;
+            border: none;
+            border-bottom: 2px solid #3498db;
+            background-color: rgba(255, 255, 255, 0.7);
+            color: #333;
+            font-size: 1em;
+            outline: none;
+            transition: border-bottom-color 0.3s ease-in-out;
+        }
+
+        input[type="password"] {
+            letter-spacing: 2px;
+        }
+
+        input:focus {
+            border-bottom-color: #3498db;
+        }
+
+        input[type="submit"] {
+            background-color: #3498db;
+            color: #fff;
+            font-weight: bold;
+            border: black;
+            border-radius: 8px;
+            padding: 15px;
+            cursor: pointer;
+            transition: background-color 0.3s ease-in-out;
+        }
+
+        input[type="submit"]:hover {
+            background-color: #2980b9;
+        }
+
+        .message {
+            text-align: center;
+            color: #ecf0f1;
+            font-size: 0.9em;
+        }
+
+        .message a {
+            color: #3498db;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .message a:hover {
+            text-decoration: underline;
+            color: #2980b9;
+        }
+        .footer {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            text-align: center;
+            padding: 10px 0;
+        }
+    </style>
+</head>
+<body>
+<br>
+<h1 align="center">Kindly enter required details</h1>
+<br>
+<form method="post" action="/next/{{ new }}">
+    <br>
+    {% if new == "signin" %}
+    <input type="text" name="name" placeholder="Username" required>
+    <br>
+    {% endif %}
+    <input type="text" name="email" placeholder="Email" required>
+    <br>
+    <input type="password" name="password" placeholder="Password" required>
+    <br><br>
+    {% if new == "signin" %}
+    <input type="submit" value="Create Account">
+    {% endif %}
+    {% if new != "signin" %}
+    <input type="submit" value="Log In">
+    {% endif %}
+    <div style="color: red; text-align: center;">{{ err }}</div>
+</form>
+<footer class="footer" >
+    <h2>pRock</h2>
+    <p >Copyright © 2024 pRock Pvt. Ltd. All rights reserved.</p>
+</footer>
+</body>
+</html>
