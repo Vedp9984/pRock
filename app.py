@@ -6,6 +6,7 @@ import io
 # from io import BytesIO
 import cv2 as cv
 import numpy as np
+import shutil
 import bcrypt
 import pymysql
 import psycopg2
@@ -14,6 +15,8 @@ import jwt
 from PIL import Image
 from flask import Flask, render_template, request, redirect, url_for, jsonify, session, Response
 import os
+from moviepy.editor import ImageClip, concatenate_videoclips, AudioFileClip, concatenate_audioclips, VideoFileClip, ImageSequenceClip
+from moviepy.editor import *
 app = Flask(__name__)
 app.secret_key = "this_is_worlds_most_secured_secret_key"
 # mydb = pymysql.connect(
@@ -59,6 +62,29 @@ salt = bcrypt.gensalt()
 def hash_password(password):
     hashed_password = bcrypt.hashpw(password.encode('utf-8'), salt)
     return hashed_password.decode('utf-8')
+
+def empty_directory(directory_path):
+    for filename in os.listdir(directory_path):
+        file_path = os.path.join(directory_path, filename)
+        if os.path.isfile(file_path):
+            os.remove(file_path)
+            print(f"Deleted: {file_path}")
+        else:
+            print(f"Not a file: {file_path}")
+
+def moveImage(img_obj, filename):
+    dest_dir = 'Users-images/'
+    new_image_path = os.path.join(dest_dir, filename)
+    img_obj.save(new_image_path)
+
+def processedImage(image_blob, filename):
+    img_obj = Image.open(io.BytesIO(image_blob))
+    # print(img_obj.size)
+    resized_object = img_obj.resize((2500, 1500))
+    # print(resized_object.size)
+    # print(filename[0])
+    moveImage(resized_object, filename[0])
+    return resized_object
 
 def blob_to_base64(blob_data):
     return base64.b64encode(blob_data).decode('utf-8')
@@ -233,8 +259,39 @@ def newHome():
     return render_template('home2.html', user=uname, permission="")
 
 @app.route('/newVideo', methods = ['GET', 'POST'])
-def displays():
+def view_video():
     return render_template('video.html')
+
+def create_video(image_list, audio_flag, audio_file, num):
+    frames = []
+    for img_path in image_list:
+        n = cv.imread(img_path)
+        n = cv.cvtColor(n, cv.COLOR_BGR2RGB)
+        # Now, instead of appending the same frame multiple times,
+        # we'll handle the duration of each frame in the video using fps and duration in ImageSequenceClip.
+        frames.append(n)
+
+    # Assuming you want each image to last for 3 seconds, calculate duration per image
+    duration_per_image = num  # seconds
+    fps = 1 # frames per second
+    
+    # Calculate the total duration of the video
+    total_duration = len(image_list) * duration_per_image
+
+    # Use ImageSequenceClip to create the video clip from frames
+    # Note: Each image will appear for duration_per_image / fps seconds
+    video = ImageSequenceClip(frames, fps=fps)
+
+    # Set duration of each image to 3 seconds
+    video.set_duration(total_duration)
+    
+    audio = AudioFileClip(audio_file)
+    audio = audio.subclip(0, total_duration)
+    video = video.set_audio(audio)
+    output_file_path = os.path.join('Users-images', 'video.mp4')
+    print("debug_cascade")
+    video.write_videofile(output_file_path, codec='libx264', audio= True)
+    return []
 
 @app.route('/users', methods = ['POST', 'GET'])
 def display():
@@ -278,11 +335,17 @@ def crVid():
         actual_names = []
     # print(lists)
     nice_images  =[]
+    imgs = []
+    iterator = 0
     for items in lists:
         img_blobs.append(items[0])
+        imgs.append(processedImage(items[0], names[iterator]))
+        iterator = iterator + 1
+    # print(imgs)
     if len(img_blobs) == 0:
         uname = session['user_details']['username']
         return render_template('home2.html', user=uname, permission="No images are selected")
+    
     for blobs in img_blobs:
         nice_images.append(blob_to_base64(blobs))
     # print(nice_images)
@@ -290,33 +353,66 @@ def crVid():
 
 @app.route('/slideshow', methods = ['GET', 'POST'])
 def show():
-    fetched_data = request.form.getlist('images')
-    # print(fetched_data)
+    img_b64 = request.form.getlist('images')
     bg_music = request.form.get('bgm')
-    print(bg_music)
     audio_flag = request.form.get('music_flag')
-    print(audio_flag)
-    blobs = []
-    for imgs in fetched_data:
-        blobs.append(base64_to_blob(imgs))
-    # print(blobs)
-    print("before")
-    resized_nps = []
-    for blob in blobs:
-        resized_nps.append(resize(blob))
-    print(resized_nps)
-    query = 'SELECT bindata FROM audio_library WHERE audio_name = "big_music"'
+    FPSinv = request.form.get('fpsinv')
+    # print(img_b64)
+    print("length:", len(img_b64))
+    unique_uname = session['user_details']['username']
+    query = f'SELECT id FROM users WHERE username = "{unique_uname}"'
+    print(query)
+    cur.execute(query)
+    uId = cur.fetchone()
+    uId = uId[0]
+    query = f'SELECT image_name from uploaded_images WHERE user_id = {uId}'
+    cur.execute(query)
+    fake_img_names = cur.fetchall()
+    actual_img_names = []
+    for imgs in fake_img_names:
+        actual_img_names.append(imgs[0])
+    # print(actual_img_names)
+    dictionary = {}
+    iterator = 0
+    query = f'SELECT bindata FROM uploaded_images WHERE user_id = {uId}'
+    cur.execute(query)
+    fake_blobs = cur.fetchall()
+    actual_blobs = []
+    for blob in fake_blobs:
+        actual_blobs.append(blob[0])
+    actual_b64s = []
+    for blobs in actual_blobs:
+        actual_b64s.append(blob_to_base64(blobs))
+    # print(actual_blobs)
+    for b64s in actual_b64s:
+        dictionary[f"{b64s}"] = actual_img_names[iterator]
+        iterator = iterator + 1
+        print(dictionary[f"{b64s}"])
+    final_paths = []
+    img_b64 = [x[20:] for x in img_b64]
+    
+    for final_path in img_b64:
+        # print(final_path)
+        final_paths.append(dictionary[f"{final_path}"])
+    final_paths = ['Users-images/' + x for x in final_paths]
+    print(final_paths)
+    query = 'SELECT bindata FROM audio_library WHERE audio_name = %s'
     cur.execute(query, (bg_music,))
     music_blob = cur.fetchone()
-    music_blob = music_blob[0]
-    # print(music_blob)
-    return Response("success", 200)
+    if audio_flag == 1:
+        music_blob = music_blob[0]
+    # music_file_path = 'Users-images' + bg_music
+    bg_music = bg_music + '.mp3'
+    video = create_video(final_paths, audio_flag, bg_music, FPSinv)
+    
+    return Response(video, 200)
 
 
 @app.route('/logout', methods=['GET', 'POST'])
 def logout():
     session.pop('jwt_token', None)
     session.pop('user_details', None)
+    empty_directory('Users-images')
     return redirect(url_for('index'))
 
 if __name__ == "__main__":
