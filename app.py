@@ -413,7 +413,7 @@ def logout():
     session.pop('jwt_token', None)
     session.pop('user_details', None)
     empty_directory('Users-images')
-    return redirect(url_for('index'))
+    return redirect(url_for('newHome'))
 
 if __name__ == "__main__":
     app.run(debug=True)
