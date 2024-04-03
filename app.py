@@ -342,7 +342,7 @@ def show():
     cur.execute(query, (unique_uname,))
     uId = cur.fetchone()
     uId = uId[0]
-    query = 'SELECT image_name from uploaded_images WHERE user_id = %d'
+    query = 'SELECT image_name from uploaded_images WHERE user_id = %s'
     cur.execute(query, (uId,))
     fake_img_names = cur.fetchall()
     actual_img_names = []
@@ -351,7 +351,7 @@ def show():
     # print(actual_img_names)
     dictionary = {}
     iterator = 0
-    query = 'SELECT bindata FROM uploaded_images WHERE user_id = %d'
+    query = 'SELECT bindata FROM uploaded_images WHERE user_id = %s'
     cur.execute(query, (uId,))
     fake_blobs = cur.fetchall()
     actual_blobs = []
