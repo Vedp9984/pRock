@@ -1,9 +1,8 @@
-#online database
+
 import datetime
 import json
 import base64
 import io
-# from io import BytesIO
 import cv2 as cv
 import numpy as np
 import shutil
@@ -51,7 +50,7 @@ def mydb():
 print(mydb())
 cur = mydb().cursor()
 # cur.execute("CREATE DATABASE pRock")
-# cur.execute("use pRock")
+cur.execute("use pRock")
 # if mydb.open:
 #     print("Connected")
 #     cur = mydb.cursor()
@@ -62,7 +61,6 @@ salt = bcrypt.gensalt()
 def hash_password(password):
     hashed_password = bcrypt.hashpw(password.encode('utf-8'), salt)
     return hashed_password.decode('utf-8')
-
 def empty_directory(directory_path):
     for filename in os.listdir(directory_path):
         file_path = os.path.join(directory_path, filename)
@@ -71,12 +69,10 @@ def empty_directory(directory_path):
             print(f"Deleted: {file_path}")
         else:
             print(f"Not a file: {file_path}")
-
 def moveImage(img_obj, filename):
     dest_dir = 'Users-images/'
     new_image_path = os.path.join(dest_dir, filename)
     img_obj.save(new_image_path)
-
 def processedImage(image_blob, filename):
     img_obj = Image.open(io.BytesIO(image_blob))
     # print(img_obj.size)
@@ -85,15 +81,12 @@ def processedImage(image_blob, filename):
     # print(filename[0])
     moveImage(resized_object, filename[0])
     return resized_object
-
 def blob_to_base64(blob_data):
     return base64.b64encode(blob_data).decode('utf-8')
-
 def base64_to_blob(base64_string):
     decoded_bytes = base64.b64decode(base64_string)
     # blob = io.BytesIO(decoded_bytes)
     return decoded_bytes
-
 def resize(blob_data):
     new_width = 800
     new_height = 600
@@ -120,20 +113,16 @@ def resize(blob_data):
     # # print(blob_data)
     # resized_image = cv.resize(image, (new_width, new_height))
     # return resized_image.tostring()
-
 not_allowed = 0
-
 @app.route('/', methods=['POST','GET'])
 def index():
     return render_template("home.html")
-
 @app.route('/phin', methods=['POST', 'GET'])
 def phin():
     token = session.get('jwt_token')
     if not token:
         return redirect(url_for('index'))
     return render_template("index.html")
-
 @app.route('/video', methods=['POST', 'GET'])
 def video():
     token = session.get('jwt_token')
@@ -166,8 +155,6 @@ def video():
                 mydb().commit()
     
     return redirect(url_for('newHome'))
-
-
 @app.route('/next/<typer>', methods=['POST', 'GET'])
 def add(typer):
     token = session.get('jwt_token')
@@ -245,7 +232,6 @@ def add(typer):
                     return redirect(url_for('newHome'))
         return render_template("login.html", err="Incorrect username / password", new=typer)
     return render_template("login.html", new=typer)
-
 @app.route('/home2', methods=['POST', 'GET'])
 def newHome():
     global not_allowed
@@ -257,11 +243,9 @@ def newHome():
         not_allowed = 0
         return render_template('home2.html', user=uname, permission="Sorry! you don't have access to this feature")
     return render_template('home2.html', user=uname, permission="")
-
 @app.route('/newVideo', methods = ['GET', 'POST'])
 def view_video():
     return render_template('video.html')
-
 def create_video(image_list, audio_flag, audio_file, num):
     frames = []
     for img_path in image_list:
@@ -270,29 +254,25 @@ def create_video(image_list, audio_flag, audio_file, num):
         # Now, instead of appending the same frame multiple times,
         # we'll handle the duration of each frame in the video using fps and duration in ImageSequenceClip.
         frames.append(n)
-
     # Assuming you want each image to last for 3 seconds, calculate duration per image
-    duration_per_image = 1  # seconds
+    duration_per_image = num  # seconds
     fps = 1 / int(num) # frames per second
     
     # Calculate the total duration of the video
     total_duration = len(image_list) * int(num)
-
     # Use ImageSequenceClip to create the video clip from frames
     # Note: Each image will appear for duration_per_image / fps seconds
     video = ImageSequenceClip(frames, fps=fps)
-
     # Set duration of each image to 3 seconds
     video.set_duration(total_duration)
     
     audio = AudioFileClip(audio_file)
     audio = audio.subclip(0, total_duration)
     video = video.set_audio(audio)
-    output_file_path = os.path.join('Users-images', 'video.mp4')
+    output_file_path = os.path.join('static', 'video.mp4')
     print("debug_cascade")
     video.write_videofile(output_file_path, codec='libx264', audio= True)
     return []
-
 @app.route('/users', methods = ['POST', 'GET'])
 def display():
     global not_allowed
@@ -308,7 +288,6 @@ def display():
     list_of_users = cur.fetchall()
     print(list_of_users)
     return jsonify(list_of_users)
-
 @app.route('/create', methods=['GET', 'POST'])
 def crVid():
     img_blobs = []
@@ -324,7 +303,6 @@ def crVid():
         query = 'SELECT bindata FROM uploaded_images WHERE user_id = %s'
         cur.execute(query, (uId,))
         lists = cur.fetchall()
-
         # Prepare SQL query to fetch image names
         query = 'SELECT image_name FROM uploaded_images WHERE user_id = %s'
         cur.execute(query, (uId,))
@@ -350,7 +328,6 @@ def crVid():
         nice_images.append(blob_to_base64(blobs))
     # print(nice_images)
     return render_template('select.html', nice_images=nice_images, searchList=actual_names)
-
 @app.route('/slideshow', methods = ['GET', 'POST'])
 def show():
     img_b64 = request.form.getlist('images')
@@ -379,7 +356,7 @@ def show():
     fake_blobs = cur.fetchall()
     actual_blobs = []
     for blob in fake_blobs:
-        actual_blobs.append(blob[0])
+      actual_blobs.append(blob[0])
     actual_b64s = []
     for blobs in actual_blobs:
         actual_b64s.append(blob_to_base64(blobs))
@@ -406,17 +383,14 @@ def show():
     video = create_video(final_paths, audio_flag, bg_music, FPSinv)
     
     return Response(video, 200)
-
-
 @app.route('/logout', methods=['GET', 'POST'])
 def logout():
     session.pop('jwt_token', None)
     session.pop('user_details', None)
     empty_directory('Users-images')
-    return redirect(url_for('newHome'))
-
+    return redirect(url_for('index'))
 if __name__ == "__main__":
     app.run(debug=True)
-
 mydb().commit()
-
+# cur.close()
+# mydb().close()
