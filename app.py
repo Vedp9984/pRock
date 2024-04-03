@@ -50,7 +50,7 @@ def mydb():
 print(mydb())
 cur = mydb().cursor()
 # cur.execute("CREATE DATABASE pRock")
-cur.execute("use pRock")
+# cur.execute("use pRock")
 # if mydb.open:
 #     print("Connected")
 #     cur = mydb.cursor()
