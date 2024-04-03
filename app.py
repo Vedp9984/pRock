@@ -272,11 +272,11 @@ def create_video(image_list, audio_flag, audio_file, num):
         frames.append(n)
 
     # Assuming you want each image to last for 3 seconds, calculate duration per image
-    duration_per_image = num  # seconds
-    fps = 1 # frames per second
+    duration_per_image = 1  # seconds
+    fps = 1 / int(num) # frames per second
     
     # Calculate the total duration of the video
-    total_duration = len(image_list) * duration_per_image
+    total_duration = len(image_list) * int(num)
 
     # Use ImageSequenceClip to create the video clip from frames
     # Note: Each image will appear for duration_per_image / fps seconds
