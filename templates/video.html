@@ -9,20 +9,23 @@
         margin: 0;
         padding: 0;
         font-family: Arial, sans-serif;
+        background: linear-gradient(to right, #833ab4, #fd1d1d, #fcb045);
     }
     
     .video-container {
+        padding-top: 2cm;
         position: relative;
         width: 100%;
         max-width: 800px;
         margin: 0 auto;
         border-radius: 10px;
         overflow: hidden;
+        align-items:center;
     }
     
     video {
         width: 100%;
-        height: auto;
+        height: 80%;
         display: block;
     }
     
@@ -80,7 +83,7 @@
     <div class="video-container">
         <video id="video">
             <source src="{{ url_for('static', filename='/video.mp4')}}" type="video/mp4">
-            
+
         </video>
         <div class="controls">
             <button class="control-button" id="play-pause-button">&#9658;</button>
@@ -166,16 +169,16 @@
         });
 
         resolutionSelector.addEventListener('change', function() {
-    const selectedResolution = this.value;
-    console.log('Selected resolution:', selectedResolution);
-    const sourceElement = video.querySelector('source');
-    console.log('Current video source:', sourceElement.src);
-    const currentSrc = sourceElement.src;
-    const newSrc = currentSrc.replace(/\d+p/, selectedResolution + 'p');
-    console.log('New video source:', newSrc);
-    sourceElement.src = newSrc;
-    video.load();
-});
+        const selectedResolution = this.value;
+        console.log('Selected resolution:', selectedResolution);
+        const sourceElement = video.querySelector('source');
+        console.log('Current video source:', sourceElement.src);
+        const currentSrc = sourceElement.src;
+        const newSrc = currentSrc.replace(/\d+p/, selectedResolution + 'p');
+        console.log('New video source:', newSrc);
+        sourceElement.src = newSrc;
+        video.load();
+    });
 
         fullscreenButton.addEventListener('click', function() {
             if (video.requestFullscreen) {
