@@ -131,7 +131,7 @@
 document.addEventListener('DOMContentLoaded', function() {
 
     ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
-        dropArea.addEventListener(eventName,    Defaults, false);
+        dropArea.addEventListener(eventName,   preventDefaults, false);
     });
 
     ['dragenter', 'dragover'].forEach(eventName => {
@@ -150,10 +150,10 @@ document.addEventListener('DOMContentLoaded', function() {
 //     createJSON();
 // })
 
-// function preventDefaults(e) {
-//     e.preventDefault();
-//     e.stopPropagation();
-// }
+function preventDefaults(e) {
+    e.preventDefault();
+    e.stopPropagation();
+}
 
 function highlight(e) {
     dropArea.classList.add('highlight');
