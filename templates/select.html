@@ -223,7 +223,7 @@
           const transition = document.getElementById('transitionDuration')
           formData.append('fpsinv', transition.value)
           console.log(formData);
-          alert('wait')
+          // alert('wait')
           fetch('/slideshow', {
             method: 'POST',
             body: formData
