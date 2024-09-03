@@ -46,7 +46,7 @@ def mydb():
         f"sslrootcert={cert_path}"
     )
     return conn
-# mydb=getdb()
+
 print(mydb())
 cur = mydb().cursor()
 # cur.execute("CREATE DATABASE pRock")
